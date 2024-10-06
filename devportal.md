@@ -20,7 +20,7 @@ The current system, which uses Kubernetes jobs for managing domain-specific conf
 |----------------------------------|-----------------------------------------|-------------------------|-----------------------------------------------------------------------------------------------|
 | Default domain configuration     | Managed by K8s job                      | Yes                     | The default domain will have a dedicated Route CR.                                             |
 | Custom domain configuration      | Tenant-specific and managed by K8s job  | Yes                     | Each tenant will have a custom Route CR for its domain.                                        |
-| Cloudflare SSL verification      | Not part of current setup               | Yes                     | SSL certificates are verified through Cloudflare when enabled, falling back to direct SSL.     |
+| Cloudflare SSL verification      |     SSL certificates are verified through Cloudflare when enabled, falling back to direct SSL.         | Yes                     | No change    |
 
 ## Design Considerations
 DevPortal will require the following two Route CRs:
