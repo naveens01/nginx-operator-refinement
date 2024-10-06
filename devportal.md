@@ -1,7 +1,7 @@
 # DevPortal NGINX Operator Refinement Documentation
 
 ## Summary
-DevPortal’s configuration involves two configuration files—one for the default domain and another for custom domains, similar to the Control Plane setup. The system leverages an NGINX Operator-based approach where configuration is managed using Custom Resource Definitions (CRDs). Additionally, Cloudflare is integrated for SSL verification. When Cloudflare is enabled, SSL certificates are verified through it; when disabled, the system behaves as the Control Plane, using direct SSL verification.
+DevPortal’s configuration involves two configuration files—one for the default domain and another for custom domains. The system leverages an NGINX Operator-based approach where configuration is managed using Custom Resource Definitions (CRDs). Additionally, Cloudflare is integrated for SSL verification. When Cloudflare is enabled, SSL certificates are verified through it; when disabled, the system handles SSL verification internally.
 
 ## Motivation
 The current system, which uses Kubernetes jobs for managing domain-specific configurations, lacks robustness and fault tolerance. Transitioning to an operator-based model will enhance scalability and reliability, while Cloudflare integration will provide improved SSL handling.
@@ -20,7 +20,7 @@ The current system, which uses Kubernetes jobs for managing domain-specific conf
 |----------------------------------|-----------------------------------------|-------------------------|-----------------------------------------------------------------------------------------------|
 | Default domain configuration     | Managed by K8s job                      | Yes                     | The default domain will have a dedicated Route CR.                                             |
 | Custom domain configuration      | Tenant-specific and managed by K8s job  | Yes                     | Each tenant will have a custom Route CR for its domain.                                        |
-| Cloudflare SSL verification      | Not present in Control Plane            | Yes                     | SSL certificates are verified through Cloudflare when enabled, falling back to direct SSL.     |
+| Cloudflare SSL verification      | Not part of current setup               | Yes                     | SSL certificates are verified through Cloudflare when enabled, falling back to direct SSL.     |
 
 ## Design Considerations
 DevPortal will require the following two Route CRs:
@@ -33,7 +33,7 @@ DevPortal will require the following two Route CRs:
   Manages traffic to DevPortal’s default domain, including SSL verification and routing via a wildcard subdomain pattern (e.g., `*.qdn`). It also handles dynamic requests across various services.
   
 - **Logging and SSL Setup:**  
-  Like Control Plane, logging is dynamic, and SSL certificates are handled through TLS secrets. When Cloudflare is enabled, SSL verification is performed through Cloudflare; otherwise, direct SSL verification is used.
+  Logging is dynamic, and SSL certificates are handled through TLS secrets. When Cloudflare is enabled, SSL verification is performed through Cloudflare; otherwise, direct SSL verification is used.
 
 - **Proxy Settings:**  
   Requests are forwarded to DevPortal’s upstream endpoint. Configurable timeouts ensure network conditions are handled appropriately.
@@ -47,7 +47,7 @@ DevPortal will require the following two Route CRs:
   SSL certificates are managed per tenant through custom TLS secrets. Cloudflare integration allows for SSL verification through their service, falling back to internal verification when Cloudflare is disabled.
 
 - **Proxy Settings and Redirection:**  
-  Like Control Plane, requests are proxied to the upstream endpoint, and HTTP-to-HTTPS redirection is enforced for secure communication.
+  Requests are proxied to the upstream endpoint, and HTTP-to-HTTPS redirection is enforced for secure communication.
 
 ## Cloudflare Integration
 
@@ -55,4 +55,4 @@ DevPortal will require the following two Route CRs:
   When enabled, Cloudflare will manage SSL certificate verification. The NGINX configuration will ensure that requests are routed through Cloudflare, leveraging their CDN and security features.
   
 - **Disabled:**  
-  When disabled, SSL certificates are verified internally, similar to the Control Plane configuration.
+  When disabled, SSL certificates are verified internally.
